@@ -35,7 +35,7 @@ body {
   background-color: var(--tertiary-color);
   background-image: none;
 }
-header{
+header {
   display: flex;
   justify-content: space-between;
 }
@@ -62,17 +62,17 @@ nav ul li {
 }
 nav ul li a {
   padding-inline: 10px;
-  color: var(--contrast-color)
+  color: var(--contrast-color);
 }
 .overlay {
   position: absolute;
-  background-color:rgb(255, 255, 255, .5);
+  background-color: rgb(255, 255, 255, 0.5);
   display: inline;
   padding-left: 10px;
 }
 ul.carFeatures {
   padding: 0;
-  color:var(--primary-color);
+  color: var(--primary-color);
   margin: 0;
 }
 li.model {
@@ -82,7 +82,7 @@ img.ownBtn {
   width: 110px;
   height: auto;
 }
-img.smallPic{
+img.smallPic {
   display: block;
   width: 75%;
   height: auto;
@@ -112,8 +112,6 @@ div.upgrades {
   border: solid 1px var(--dark-gray);
   background-color: var(--primary-color);
   margin: 0 0 2em 0;
-  
-  
 }
 div.upgrades img {
   width: 70px;
@@ -129,8 +127,6 @@ div.upgrades a {
   justify-content: center;
   margin-top: 1em;
 }
-
-
 
 @media screen and (min-width: 500px) {
   body {
