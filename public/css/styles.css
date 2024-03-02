@@ -4,10 +4,7 @@
   --font-headline: Literata, sans-serif;
   /* colors */
   --primary-color: #01aed1;
-  --secondary-color: #3f612d;
   --tertiary-color: #ffffff;
-  --primary-accent-color: #a3333d;
-  --secondary-accent-color: #fadd38;
   --dark-gray: #222121;
   --contrast-color: #ffffff;
 
@@ -66,7 +63,7 @@ nav ul li a {
 }
 .overlay {
   position: absolute;
-  background-color: rgb(255, 255, 255, 0.5);
+  background-color: rgb(255, 255, 255, 0.8);
   display: inline;
   padding-left: 10px;
 }
@@ -131,5 +128,65 @@ div.upgrades a {
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
+    width: 100%;
+  }
+  #wrapper {
+    background-color: var(--tertiary-color);
+    border: var(--primary-color) 5px solid;
+    border-radius: 1em;
+    margin: 1em auto 1em auto;
+    padding-top: 1.5em;
+    width: 75%;
+  }
+  img.smallPic {
+    display: none;
+  }
+  img.largePic {
+    display: block;
+    width: 75%;
+    height: auto;
+    margin: auto;
+  }
+  .siteName {
+    padding-top: 0;
+  }
+  nav {
+    width: 98%;
+    margin: auto;
+  }
+  h3 {
+    margin-left: 10px;
+    font-size: 34px;
+    margin-bottom: 0;
+  }
+  .overlay {
+    font-size: 26px;
+    margin-left: 1em;
+    margin-top: 1.5em;
+  }
+  img.ownBtn {
+    width: 175px;
+    height: auto;
+    margin-top: 1.5em;
+    box-shadow: 1px 1px 6px var(--dark-gray);
+  }
+  .reviews {
+    float: right;
+  }
+  .reviewTitle {
+    font-size: 20px;
+    margin: 2em 0 0 1em;
+  }
+  ul.reviews li {
+    padding: 10px 10px 10px 10px;
+    text-wrap: wrap;
+  }
+  .upgradeTitle {
+    font-size: 20px;
+    margin: 2em 0 2em 10px;
+  }
+  .upgrades {
+    margin-left: 10px;
+    width: 45%;
   }
 }
