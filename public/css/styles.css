@@ -130,7 +130,10 @@ div.upgrades a {
   justify-content: center;
   margin-top: 1em;
 }
-h2 {
+h2{
+  font-size: 20px;
+}
+h4 {
   display: none;
 }
 @media screen and (min-width: 500px) {
