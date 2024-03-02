@@ -45,6 +45,9 @@ div#tools {
   padding: 5px;
   color: var(--dark-gray);
 }
+nav {
+  width: 100%;
+}
 nav ul {
   display: flex;
   background-color: var(--dark-gray);
