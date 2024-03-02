@@ -3,7 +3,7 @@
   --font-body: Rasa, sans-serif;
   --font-headline: Literata, sans-serif;
   /* colors */
-  --primary-color: #68534b;
+  --primary-color: #e9f547;
   --tertiary-color: #ffffff;
   --dark-gray: #222121;
   --contrast-color: #ffffff;
@@ -142,7 +142,7 @@ div.upgrades a {
     border-radius: 1em;
     margin: 1em auto 1em auto;
     padding-top: 1.5em;
-    width: 75%;
+    width: 850px;
   }
   img.smallPic {
     display: none;
