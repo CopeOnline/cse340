@@ -130,7 +130,9 @@ div.upgrades a {
   justify-content: center;
   margin-top: 1em;
 }
-
+h4 {
+  display: none;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
