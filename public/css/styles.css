@@ -136,6 +136,18 @@ h2{
 h4 {
   display: none;
 }
+#inv-display {
+  display:block;
+}
+#inv-display li {
+  border: var(--dark-gray) 1px solid;
+  margin: 1em auto 1em auto;
+  width: 200px;
+}
+.namePrice {
+  padding-bottom: 10px;
+  text-align: center;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
@@ -201,5 +213,19 @@ h4 {
   }
   footer {
     padding-left: 20px;
+  }
+  #inv-display {
+    display: flex;
+    flex-wrap: wrap;
+
+  }
+  #inv-display li {
+    border: var(--dark-gray) 1px solid;
+    margin: 1em 1em 1em 1em;
+    width: 200px;
+  }
+  .namePrice {
+    padding-bottom: 10px;
+    text-align: center;
   }
 }
