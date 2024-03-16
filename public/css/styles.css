@@ -265,4 +265,24 @@ footer {
     padding-bottom: 10px;
     text-align: center;
   }
+  ul#inv-details {
+    display: inline-flex;
+  }
+  ul#inv-details img {
+    margin-top: 2em;
+    width: 45%;
+    height: auto;
+  }
+  .vehicleDetails hr {
+    display: none;
+  }
+  div.vehicleDetails {
+    width: 45%;
+    height: auto;
+    float: right;
+  }
+  div.vehicleDetails {
+    font-size: 15px;
+  }
 }
+
