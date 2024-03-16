@@ -175,6 +175,9 @@ ul#inv-details {
   padding: 10px 10px 0 10px;
   margin: 10px 0 10px 0;
 }
+footer {
+  padding: 0 5px 0 5px;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
