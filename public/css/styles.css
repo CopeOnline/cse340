@@ -254,6 +254,7 @@ footer {
   #inv-display {
     display: flex;
     flex-wrap: wrap;
+    justify-content: center;
 
   }
   #inv-display li {
