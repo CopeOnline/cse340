@@ -5,7 +5,14 @@ Line 4 - redirects the response object to the default index route, to deliver th
 Line 5 - ends the else structure. -->
 
 <% if (title) { %>
-    <h1><%= title %></h1>
+    <h1 class="errTitle"><%= title %></h1>
+    <%- message %>
+    <img
+      class="errPic"
+      src="/images/vehicles/no-image.png"
+      alt="no image avaialble"
+      loading="lazy"
+    >
     <% } else {
       res.redirect('/')
     } %>
@@ -13,4 +20,3 @@ Line 5 - ends the else structure. -->
 <!-- An EJS code block, using a comment mark (#), disables this code. In the future, when messages have been implemented, 
 you'll replace the comment with the unescaped mark (—), while will allow any messages that have been set to be displayed. -->
 
-<%- message %>
