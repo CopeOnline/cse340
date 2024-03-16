@@ -148,6 +148,33 @@ h4 {
   padding-bottom: 10px;
   text-align: center;
 }
+ul#inv-details {
+  display: block;
+  padding: 0 10px 0 10px;
+  font-size: 1.25em;
+} 
+#inv-details img {
+  width: 100%;
+  margin: auto;
+}
+.vehicleDetails h2 {
+  font-size: 1.5em;
+}
+.price{
+  background-color: beige;
+  padding: 10px;
+}
+.desc {
+  padding: 0 10px 0 10px;
+}
+.color {
+  padding: 10px 10px 10px 10px;
+  background-color: beige;
+}
+.miles {
+  padding: 10px 10px 0 10px;
+  margin: 10px 0 10px 0;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
@@ -176,6 +203,12 @@ h4 {
   nav {
     width: 98%;
     margin: auto;
+  }
+  h1{
+    padding-left: 10px;
+  }
+  #err {
+    padding-left: 10px;
   }
   h3 {
     margin-left: 10px;
@@ -213,6 +246,7 @@ h4 {
   }
   footer {
     padding-left: 20px;
+    padding-bottom: 5px;
   }
   #inv-display {
     display: flex;

@@ -14,6 +14,8 @@ const expressLayouts = require('express-ejs-layouts')
 const baseController = require('./controllers/baseController')
 const utilities = require('./utilities/')
 
+let message
+
 /* ***********************
  * Routes
  *************************/
@@ -32,10 +34,12 @@ app.get('/', utilities.handleErrors(baseController.buildHome))
 // Inventory routes
 app.use('/inv', inventoryRoute)
 
-// File Not Found Route - must be last route in list
+
+// File Not Found Route
 app.use(async (req, res, next) => {
-  next({ status: 404, message: 'Sorry, we appear to have lost that page.' })
+  next({ status: 404, message: '<p id="err" > Sorry, we appear to have lost that page. </p>' })
 })
+
 
 /* ***********************
 * Express Error Handler
@@ -43,10 +47,12 @@ app.use(async (req, res, next) => {
 *************************/
 app.use(async (err, req, res, next) => {
   const nav = await utilities.getNav()
+  if (`${req.originalUrl}` === "/error/" || `${req.originalUrl}` == "/inv/error/") {
+    try {throw new Error(err.status = 500)} catch (err) {next(err)}}
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
-  if (err.status === 404) { message = err.message } else { message = 'Oh no! There was a crash. Maybe try a different route?' }
+  if (err.status === 404) { message = err.message } else { message = '<p id="err"> Oh no! There was a crash. Maybe try a different route? </p>' }
   res.render('errors/error', {
-    title: err.status || 'Server Error',
+    title: `${err.status} ERROR` || 'Server Error',
     message,
     nav
   })
