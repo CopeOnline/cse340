@@ -191,6 +191,45 @@ footer {
   padding: 0 30px 0 30px;
   font-weight: 800;
 }
+.login-form {
+  display: flex;
+  flex-direction: column;
+  border: ridge 5px grey;
+  width: 85%;
+  height: auto;
+  margin: auto;
+  justify-content: center;
+  background-color: #1f3c61;
+  border-radius: 10px;
+  color: #ffffff;
+  font-size: 35px;
+  padding: 10px;
+}
+.login-form input {
+  height: 35px;
+  font-size: 30px;
+  margin: 5px 0 10px 0;
+  border-radius: 10px;
+  padding-left: 10px;
+}
+.login-form button {
+  width: 30%;
+  margin: auto;
+  height: 35px;
+  margin-top: 5px;
+  font-size: 25px;
+  font-weight: 600;
+  border-radius: 15px;
+}
+.login-form p {
+  margin: 15px auto 10px auto;
+  font-size: 25px;
+}
+.login-form p a {
+  color: #ffffff;
+  padding-left:10px;
+  text-decoration: underline;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
@@ -294,6 +333,10 @@ footer {
   }
   div.vehicleDetails {
     font-size: 15px;
+  }
+  .login-form {
+    width: 50%;
+    font-size: 25px;
   }
 }
 
