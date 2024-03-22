@@ -14,5 +14,12 @@ router.get('/register', utilities.handleErrors(accountController.buildRegister))
 // Route to register account
 router.post('/register', regValidate.registationRules(), regValidate.checkRegData, utilities.handleErrors(accountController.registerAccount))
 
+// Process the login attempt *******temporary******
+router.post(
+    "/login",
+    (req, res) => {
+      res.status(200).send('login process not implemented yet')
+    }
+  )
 
 module.exports = router
