@@ -23,8 +23,8 @@
     <label for="invmodel">Model:</label>
     <input type="text" name="inv_model" id="invmodel" required value="<%= locals.inv_model %>">
     
-    <label for="invyear">Vehicle Year:</label>
-    <input type="number" name="inv_year" id="invyear" required value="<%= locals.inv_year %>">
+    <label for="invyear">Year:</label>
+    <input type="number" name="inv_year" id="invyear" min="1900" max="9999" required  value="<%= locals.inv_year %>">
     
     <label for="invdescription">Description:</label>
     <textarea name="inv_description" id="invdescription" rows="3" column="100" required value="<%= locals.inv_description %>"></textarea>
