@@ -65,7 +65,6 @@ invCont.addNewClassificationView = async function (req, res, next) {
 invCont.addNewInventoryView = async function (req, res, next) {
   let dropdown = await utilities.buildClassificationList()
   let nav = await utilities.getNav()
-  console.log(dropdown)
   res.render("./inventory/add-inventory", {
     title: "Add New Inventory",
     nav,
@@ -84,7 +83,6 @@ const regResult = await invModel.addClassification(
   classification_name
 )
 let nav = await utilities.getNav()
-console.log(regResult)
 if (regResult) {
   req.flash(
     "notice",
@@ -115,7 +113,6 @@ const regResult = await invModel.addVehicle(
 )
 let dropdown = await utilities.buildClassificationList()
 let nav = await utilities.getNav()
-console.log(regResult)
 if (regResult) {
   req.flash(
     "notice",
