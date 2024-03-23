@@ -59,10 +59,10 @@ app.use(staticView)
 app.get('/', utilities.handleErrors(baseController.buildHome))
 
 // Inventory routes
-app.use('/inv', inventoryRoute)
+app.use('/inv', utilities.handleErrors(inventoryRoute))
 
 //Account Route
-app.use('/account', accountRoute)
+app.use('/account', utilities.handleErrors(accountRoute))
 
 
 // File Not Found Route
