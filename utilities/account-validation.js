@@ -78,6 +78,7 @@ validate.checkRegData = async (req, res, next) => {
  * Check data and return errors or continue to registration
  * ***************************** */
 validate.checkClassificationData = async (req, res, next) => {
+  console.log('validating inputs')
   const { classification_name } = req.body
   let errors = []
   errors = validationResult(req)
