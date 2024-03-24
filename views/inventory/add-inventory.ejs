@@ -6,7 +6,13 @@
 
 <%- messages() %>
 
-
+<% if (errors) { %>
+  <ul class="notice">
+ <% errors.array().forEach(error => { %>
+   <li><%= error.msg %></li>
+<%  }) %>
+ </ul>
+<% } %>
   
   
   <form class='inventory-form' action="/inv/add-inventory" method="post">
@@ -21,7 +27,7 @@
     <input type="number" name="inv_year" id="invyear" min="1" max="9999" required  value="<%= locals.inv_year %>">
     
     <label for="invdescription">Description:</label>
-    <textarea name="inv_description" id="invdescription" rows="3" column="100" required value="<%= locals.inv_description %>"></textarea>
+    <textarea name="inv_description" id="invdescription" rows="3" column="100" required><%= locals.inv_description %></textarea>
     
     <label for="invimage">Image path:</label>
     <input type="text" name="inv_image" id="invimage" required value="/images/vehicles/no-image.png" value="<%= locals.inv_image %>" >

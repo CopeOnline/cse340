@@ -52,6 +52,96 @@ validate.registationRules = () => {
     ]
   }
 
+/*  **********************************
+  *  Classification Name Validation Rules
+  * ********************************* */
+validate.classificationNameRules = () => {
+  return [
+    // firstname is required and must be string
+    body("classification_name")
+      .notEmpty()
+      .isAlpha()
+      .withMessage("Must have a valid name.") // on error this message is sent.
+    ]
+  }
+
+/*  **********************************
+  *  INvemtopry Data Validation Rules
+  * ********************************* */
+validate.inventoryRules = () => {
+  return [
+    // make is required and must be string
+    body("inv_make")
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a make."), // on error this message is sent.
+
+    // model is required and must be string
+    body("inv_model")
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a model."), // on error this message is sent.
+     
+    // year is required and must be number
+    body("inv_year")
+      .trim()
+      .notEmpty()
+      .isNumeric()
+      .isLength({ min: 4, max: 4 })
+      .withMessage("Please provide a year."), // on error this message is sent.
+      
+    // description is required and must be string
+    body("inv_description")
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a description."), // on error this message is sent.
+      
+    // image is required and must be string
+    body("inv_image")
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a image path."), // on error this message is sent.
+      
+    // thumbnail is required and must be string
+    body("inv_thumbnail")
+      .trim()
+      .notEmpty()
+      .isLength({ min: 1 })
+      .withMessage("Please provide a thumbnail path."), // on error this message is sent.
+      
+    // price is required and must be number
+    body("inv_price")
+      .trim()
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Please provide the price."), // on error this message is sent.
+      
+    // miles is required and must be a number
+    body("inv_miles")
+      .trim()
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Please provide the miles."), // on error this message is sent.
+      
+    // color is required and must be string
+    body("inv_color")
+      .trim()
+      .notEmpty()
+      .isAlpha()
+      .withMessage("Please provide a color."), // on error this message is sent.
+      
+    // classification_id is required and must be a number
+    body("classification_id")
+      .trim()
+      .notEmpty()
+      .isNumeric()
+      .withMessage("Classification is required."), // on error this message is sent.  
+  ]
+}
   /* ******************************
  * Check data and return errors or continue to registration
  * ***************************** */
@@ -78,9 +168,7 @@ validate.checkRegData = async (req, res, next) => {
  * Check data and return errors or continue to registration
  * ***************************** */
 validate.checkClassificationData = async (req, res, next) => {
-  console.log('validating inputs')
   const { classification_name } = req.body
-  let errors = []
   errors = validationResult(req)
   if (!errors.isEmpty()) {
     let nav = await utilities.getNav()
@@ -102,6 +190,7 @@ validate.checkVehicleData = async (req, res, next) => {
   const { inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id } = req.body
   let errors = []
   errors = validationResult(req)
+  console.log("checking", errors)
   if (!errors.isEmpty()) {
     let dropdown = await utilities.buildClassificationList()
     let nav = await utilities.getNav()

@@ -21,9 +21,9 @@ router.get('/add-classification', utilities.handleErrors(invController.addNewCla
 router.get('/add-inventory', utilities.handleErrors(invController.addNewInventoryView))
 
 // Route to register account
-router.post('/add-classification', regValidate.checkClassificationData, utilities.handleErrors(invController.createClassification))
+router.post('/add-classification', regValidate.classificationNameRules(), regValidate.checkClassificationData, utilities.handleErrors(invController.createClassification))
 
 // Route to build add new inventory 
-router.post('/add-inventory', regValidate.checkVehicleData, utilities.handleErrors(invController.addInventory))
+router.post('/add-inventory', regValidate.inventoryRules(), regValidate.checkVehicleData, utilities.handleErrors(invController.addInventory))
 
 module.exports = router
