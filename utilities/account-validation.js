@@ -170,7 +170,6 @@ validate.checkRegData = async (req, res, next) => {
 validate.checkClassificationData = async (req, res, next) => {
   const { classification_name } = req.body
   errors = validationResult(req)
-  console.log("checking", errors)
   if (!errors.isEmpty()) {
     let nav = await utilities.getNav()
     res.render("./inventory/add-classification", {
