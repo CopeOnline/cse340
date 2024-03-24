@@ -190,7 +190,6 @@ validate.checkVehicleData = async (req, res, next) => {
   const { inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id } = req.body
   let errors = []
   errors = validationResult(req)
-  console.log("checking", errors)
   if (!errors.isEmpty()) {
     let dropdown = await utilities.buildClassificationList()
     let nav = await utilities.getNav()
