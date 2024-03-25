@@ -264,18 +264,18 @@ invCont.deleteInventoryView = async function (req, res, next) {
 invCont.removeInventory = async function (req, res, next) {
   let nav = await utilities.getNav()
   const {
+    inv_id,
     inv_make,
     inv_model,
     inv_year,
     inv_price,
-    inv_id
   } = req.body
   const deleteResult = await invModel.removeInventory(
+    inv_id,
     inv_make,
     inv_model,
     inv_year,
     inv_price,
-    inv_id
   )
 
   if (deleteResult) {
