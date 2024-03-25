@@ -84,11 +84,26 @@ async function updateInventory(inv_id, inv_make, inv_model,  inv_description,  i
   }
 }
 
+/* *****************************
+*   Delete vehicle
+* *************************** */
+async function removeInventory(inv_make, inv_model, inv_year, inv_price){
+  console.log(inv_make, inv_model, inv_year, inv_price, "dleleeleleelelelelel")
+  try {
+    const sql = "DELETE FROM public.inventory WHERE inv_make = $1 AND inv_model = $2 AND inv_year = $3 AND inv_price = $4  RETURNING *"
+    return await pool.query(sql, [inv_make, inv_model, inv_year, inv_price])
+  } catch (error) {
+    console.error('removeInventory error ' + error)
+    return error
+  }
+}
+
 module.exports = { 
   getClassifications, 
   getInventoryByClassificationId, 
   getInventoryById, 
   addClassification, 
   addVehicle,
-  updateInventory 
+  updateInventory,
+  removeInventory 
 }

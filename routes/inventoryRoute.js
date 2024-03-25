@@ -35,4 +35,10 @@ router.get("/edit/:inv_id", utilities.handleErrors(invController.updateInventory
 // Route to submit edits to inventory
 router.post("/update/", regValidate.inventoryRules(), regValidate.checkUpdateData, utilities.handleErrors(invController.updateInventory))
 
+// Route to delete confirm
+router.get("/delete/:inv_id", utilities.handleErrors(invController.deleteInventoryView))
+
+// Route to submit inventory to delete
+router.post("/delete/", utilities.handleErrors(invController.removeInventory))
+
 module.exports = router
