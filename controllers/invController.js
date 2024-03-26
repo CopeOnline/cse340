@@ -8,12 +8,14 @@ const invCont = {}
  * ************************** */
 invCont.buildByClassificationId = async function (req, res, next) {
   const classificationId = req.params.classificationId
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const data = await invModel.getInventoryByClassificationId(classificationId)
   const grid = await utilities.buildClassificationGrid(data)
   const nav = await utilities.getNav()
   const className = data[0].classification_name
   res.render('./inventory/classification', {
     title: className + ' vehicles',
+    statusHeader,
     nav,
     grid
   })
@@ -24,12 +26,14 @@ invCont.buildByClassificationId = async function (req, res, next) {
  * ************************** */
 invCont.buildByInventoryId = async function (req, res, next) {
   const invId = req.params.inv_id
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const data = await invModel.getInventoryById(invId)
   const grid = await utilities.buildDetailsView(data)
   const nav = await utilities.getNav()
   const viewName = `${data[0].inv_year} ` + `${data[0].inv_make} ` + `${data[0].inv_model}`
   res.render('./inventory/details', {
     title: viewName,
+    statusHeader,
     nav,
     grid
   })
@@ -40,9 +44,11 @@ invCont.buildByInventoryId = async function (req, res, next) {
 * *************************************** */
 invCont.buildMangementView = async function (req, res, next) {
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const classificationSelect = await utilities.buildClassificationList()
   res.render("./inventory/management-view", {
     title: "Vehicle Management",
+    statusHeader,
     nav,
     errors: null,
     classificationSelect
@@ -54,8 +60,10 @@ invCont.buildMangementView = async function (req, res, next) {
 * *************************************** */
 invCont.addNewClassificationView = async function (req, res, next) {
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   res.render("./inventory/add-classification", {
     title: "Add Classification",
+    statusHeader,
     nav,
     errors: null,
   })
@@ -67,8 +75,10 @@ invCont.addNewClassificationView = async function (req, res, next) {
 invCont.addNewInventoryView = async function (req, res, next) {
   let dropdown = await utilities.buildClassificationList()
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   res.render("./inventory/add-inventory", {
     title: "Add New Inventory",
+    statusHeader,
     nav,
     dropdown,
     errors: null,
@@ -85,6 +95,7 @@ const regResult = await invModel.addClassification(
   classification_name
 )
 let nav = await utilities.getNav()
+const statusHeader = await utilities.buildStatusHeader(req, res)
 if (regResult) {
   req.flash(
     "notice",
@@ -92,6 +103,7 @@ if (regResult) {
   )
   res.render("./inventory/add-classification", {
     title: "Add Classification",
+    statusHeader,
     nav,
     errors: null,
   })
@@ -99,6 +111,7 @@ if (regResult) {
   req.flash("notice", `Failed, to create ${classification_name}.`)
   res.status(501).render("./inventory/add-classification", {
     title: "Add Classification",
+    statusHeader,
     nav,
   })
 }
@@ -115,6 +128,7 @@ const regResult = await invModel.addVehicle(
 )
 let dropdown = await utilities.buildClassificationList()
 let nav = await utilities.getNav()
+const statusHeader = await utilities.buildStatusHeader(req, res)
 if (regResult) {
   req.flash(
     "notice",
@@ -122,6 +136,7 @@ if (regResult) {
   )
   res.render("./inventory/add-inventory", {
     title: "Add Inventory",
+    statusHeader,
     nav,
     dropdown,
     errors: null,
@@ -130,6 +145,7 @@ if (regResult) {
   req.flash("notice", `Failed, to add ${inv_year} ${inv_make} ${inv_model} .`)
   res.status(501).render("./inventory/add-inventory", {
     title: "Add Inventory",
+    statusHeader,
     nav,
     dropdown
   })
@@ -155,11 +171,13 @@ invCont.getInventoryJSON = async (req, res, next) => {
 invCont.updateInventoryView = async function (req, res, next) {
   const inv_id = parseInt(req.params.inv_id)
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const itemData = await invModel.getInventoryById(inv_id)
   const classificationSelect = await utilities.buildClassificationList(itemData[0].classification_id)
   const itemName = `${itemData[0].inv_make} ${itemData[0].inv_model}`
   res.render("./inventory/edit-inventory", {
     title: "Edit " + itemName,
+    statusHeader,
     nav,
     classificationSelect: classificationSelect,
     errors: null,
@@ -182,6 +200,7 @@ invCont.updateInventoryView = async function (req, res, next) {
  * ************************** */
 invCont.updateInventory = async function (req, res, next) {
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const {
     inv_id,
     inv_make,
@@ -219,6 +238,7 @@ invCont.updateInventory = async function (req, res, next) {
     req.flash("notice", "Sorry, the insert failed.")
     res.status(501).render("inventory/edit-inventory", {
     title: "Edit " + itemName,
+    statusHeader,
     nav,
     classificationSelect: classificationSelect,
     errors: null,
@@ -243,10 +263,12 @@ invCont.updateInventory = async function (req, res, next) {
 invCont.deleteInventoryView = async function (req, res, next) {
   const inv_id = parseInt(req.params.inv_id)
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const itemData = await invModel.getInventoryById(inv_id)
   const itemName = `${itemData[0].inv_make} ${itemData[0].inv_model}`
   res.render("./inventory/delete-confirm", {
     title: "Delete " + itemName,
+    statusHeader,
     nav,
     errors: null,
     classification_id: itemData[0].classification_id,
@@ -263,6 +285,7 @@ invCont.deleteInventoryView = async function (req, res, next) {
  * ************************** */
 invCont.removeInventory = async function (req, res, next) {
   let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   const {
     inv_id,
     inv_make,
@@ -287,6 +310,7 @@ invCont.removeInventory = async function (req, res, next) {
     req.flash("notice", "Sorry, the delete failed.")
     res.status(501).render("inventory/delete-confirm", {
     title: "Edit " + itemName,
+    statusHeader,
     nav,
     classification_id,
     errors: null,

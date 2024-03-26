@@ -116,9 +116,11 @@ validate.checkClassificationData = async (req, res, next) => {
     errors = validationResult(req)
     if (!errors.isEmpty()) {
       let nav = await utilities.getNav()
+      const statusHeader = await utilities.buildStatusHeader(req, res)
       res.render("./inventory/add-classification", {
         errors,
         title: "Add Classification",
+        statusHeader,
         nav,
         classification_name
       })
@@ -137,9 +139,11 @@ validate.checkClassificationData = async (req, res, next) => {
     if (!errors.isEmpty()) {
       let dropdown = await utilities.buildClassificationList()
       let nav = await utilities.getNav()
+      const statusHeader = await utilities.buildStatusHeader(req, res)
       res.render("./inventory/add-inventory", {
         errors,
         title: "Add Inventory",
+        statusHeader,
         nav,
         dropdown,
         inv_make, inv_model, inv_year, inv_description, inv_image, inv_thumbnail, inv_price, inv_miles, inv_color, classification_id 
@@ -160,9 +164,11 @@ validate.checkClassificationData = async (req, res, next) => {
       const classificationSelect = await utilities.buildClassificationList(classification_id)
       const itemName = `${inv_make} ${inv_model}`
       let nav = await utilities.getNav()
+      const statusHeader = await utilities.buildStatusHeader(req, res)
       res.render("./inventory/edit-inventory", {
         errors,
         title: "Edit " + itemName,
+        statusHeader,
         nav,
         classificationSelect,
         inv_id,

@@ -88,9 +88,11 @@ validate.loginRules = () => {
     errors = validationResult(req)
     if (!errors.isEmpty()) {
       let nav = await utilities.getNav()
+      const statusHeader = await utilities.buildStatusHeader(req, res)
       res.render("account/login", {
         errors,
         title: "Login",
+        statusHeader,
         nav,
         account_email,
       })
@@ -108,9 +110,11 @@ validate.checkRegData = async (req, res, next) => {
     errors = validationResult(req)
     if (!errors.isEmpty()) {
       let nav = await utilities.getNav()
+      const statusHeader = await utilities.buildStatusHeader(req, res)
       res.render("account/register", {
         errors,
         title: "Registration",
+        statusHeader,
         nav,
         account_firstname,
         account_lastname,
@@ -120,6 +124,29 @@ validate.checkRegData = async (req, res, next) => {
     }
     next()
   }
+
+
+/* ******************************
+ * Check account type and allow access by type
+ * ***************************** */
+  validate.checkAccountType = async (req, res, next) => {
+    const { account_type } = res.locals.accountData
+    console.log(account_type, "type")
+    if (account_type !== "Employee" && account_type !== "Admin") {
+      req.flash("notice", `Unauthorized Action`)
+      let nav = await utilities.getNav()
+      const statusHeader = await utilities.buildStatusHeader(req, res)
+      res.render("account/Login", {
+        title: "Login",
+        statusHeader,
+        nav,
+        errors: null
+      })
+      return
+    }
+    next()
+  }
+
 
 
   module.exports = validate

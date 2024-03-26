@@ -52,6 +52,12 @@ app.use(bodyParser.urlencoded({ extended: true })) // for parsing application/x-
 
 app.use(cookieParser())
 
+  //Iterate users data from cookie 
+  app.get('/getuser', (req, res)=>{ 
+    //shows all the cookies 
+    res.send(req.cookies); 
+    }); 
+
 app.use(utilities.checkJWTToken)
 
 app.use(staticView)
@@ -65,7 +71,6 @@ app.use('/inv', utilities.handleErrors(inventoryRoute))
 //Account Route
 app.use('/account', utilities.handleErrors(accountRoute))
 
-
 // File Not Found Route
 app.use(async (req, res, next) => {
   next({ status: 404, message: '<p id="err" > Sorry, we appear to have lost that page. </p>' })
@@ -78,12 +83,14 @@ app.use(async (req, res, next) => {
 *************************/
 app.use(async (err, req, res, next) => {
   const nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
   if (`${req.originalUrl}` === "/error/" || `${req.originalUrl}` == "/inv/error/") {
     try {throw new Error(err.status = 500)} catch (err) {next(err)}}
   console.error(`Error at: "${req.originalUrl}": ${err.message}`)
   if (err.status === 404) { message = err.message } else { message = '<p id="err"> Oh no! There was a crash. Maybe try a different route? </p>' }
   res.render('errors/error', {
     title: err.status || 'Server Error',
+    statusHeader,
     message,
     nav
   })
