@@ -20,4 +20,10 @@ router.post("/login", regValidate.loginRules(), regValidate.checkLoginData, util
 //Process updated inventory
 router.get('/', utilities.checkLogin, utilities.handleErrors(accountController.buildAccountManagement))
 
+//Process to update user account
+router.get('/update/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildAccountUpdateView))
+
+//Process to logout
+router.get('/logout', utilities.handleErrors(accountController.buildLogout))
+
 module.exports = router

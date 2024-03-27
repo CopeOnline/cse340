@@ -60,6 +60,48 @@ Util.buildClassificationGrid = async function (data) {
 }
 
 /* **************************************
+* Build the update view
+* ************************************ */
+Util.buildAccountUpdateGrid = async function (data) {
+  let grid
+  if (data) {
+    grid = '<form class="update-form" action="/account/register" method="post">'
+    grid += '<label for="firstname">First Name:</label>'
+    grid += '<input type="text" name="account_firstname" id="accountFirstname" required value="' + data.rows[0].account_firstname + '">'
+    grid += '<label for="lastname">Last Name:</label>'
+    grid += '<input type="text" id="accountlastname" name="account_lastname" required value="' + data.rows[0].account_lastname + '">'
+    grid += '<label for="email">Email:</label>'
+    grid += '<input type="email" id="accountemail" name="account_email" required value="' + data.rows[0].account_email + '">'
+    grid += '<input type="hidden" name="account_id" value="' + data.rows[0].account_id + '">'
+    grid += '<button type="submit">Update Now</button>'
+    grid += '</form>'
+
+
+
+    grid += '<form class="password-form" action="/account/register" method="post"></form>'
+    grid += '<h2>Change Password</h2>'
+    grid += '<label for="password">Password:</label>'
+    grid += '<input type="password" id="accountpassword" name="account_password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">'
+    grid +=  '<input type="hidden" name="account_id" value="' + data.rows[0].account_id + '">'
+    grid += '<div>'
+    grid += '<p>Passwords must have at least:</p>'
+    grid += '<ol>'
+    grid += '<li>a minimum of 12 characters</li>'
+    grid += '<li>one capital letter</li>'
+    grid += '<li>one lower case letter</li>'
+    grid += '<li>one number</li>'
+    grid += '<li>one non-alphanumeric character</li>'
+    grid += '</ol>'
+    grid += '</div>'
+    grid += '<button type="submit">Change Password</button>'
+    grid += '</form>'
+  } else {
+    grid += '<p class="notice">Sorry, no matching accounts could be found.</p>'
+  }
+  return grid
+}
+
+/* **************************************
 * Build the details view HTML
 * ************************************ */
 Util.buildDetailsView = async function (data) {
@@ -168,13 +210,29 @@ Util.checkLogin = (req, res, next) => {
 Util.buildStatusHeader = async function (req, res) {
   let header;
   if (res.locals.loggedin) {
-    accountData = res.locals.accountData
-  header = `<a title="Click to log out" href="/account/">Welcome ${accountData.account_firstname} </a>`
+    let accountData = res.locals.accountData
+  header = `<a title="Go to account" href="/account/">Welcome ${accountData.account_firstname} </a>`
       header +=  '<a title="Click to log out" href="/account/logout">Logout</a>'
   }else{
   header = '<a title="Click to log in" href="/account/login">My Account</a>'
   }
   return header
+}
+
+Util.buildGreeting = async function (req, res) {
+  let greeting;
+  let accountData = res.locals.accountData
+  if (accountData.account_type === "Employee" || accountData.account_type === "Admin") {
+    greeting = `<h2 class="greeting">Welcome ${accountData.account_firstname} </h2>`
+      greeting += '<a title="Click to update accounts" href="/account/update">Edit Account Information</a>' 
+      greeting += '<h3>Inventory Manage</h3>'
+      greeting += '<a title="Click to edit inventory" href="/inv">Manage Inventory</a>' 
+  }else if (accountData.account_type === "Client") {
+  greeting = `<h2 class="greeting">Welcome ${accountData.account_firstname} </h2>`
+    greeting += '<a title="Click to update accounts" href="/account/update/'
+                 + accountData.account_id + '">Edit Account Information</a>' 
+  }
+  return greeting
 }
 
 

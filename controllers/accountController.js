@@ -20,6 +20,19 @@ async function buildLogin(req, res, next) {
 }
 
 /* ****************************************
+*  Deliver logout view
+* *************************************** */
+async function buildLogout(req, res, next) {
+
+  res.clearCookie('jwt');
+  res.locals.loggedin = 0
+  console.log(res.url)
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  res.redirect('/')
+}
+
+/* ****************************************
 *  Deliver registration view
 * *************************************** */
 async function buildRegister(req, res, next) {
@@ -39,10 +52,33 @@ async function buildRegister(req, res, next) {
 async function buildAccountManagement(req, res, next) {
   let nav = await utilities.getNav()
   const statusHeader = await utilities.buildStatusHeader(req, res)
-  res.render("account/account-management", {
+  const greeting = await utilities.buildGreeting(req, res)
+  res.render("./account/account-management", {
+    errors: null,
     title: "Account",
     statusHeader,
     nav,
+    greeting,
+    
+  })
+}
+
+/* ****************************************
+*  Deliver account update view
+* *************************************** */
+async function buildAccountUpdateView(req, res, next) {
+  const accntId = req.params.id
+  const data = await accountModel.getAccountById(accntId)
+  const grid = await utilities.buildAccountUpdateGrid(data)
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreeting(req, res)
+  res.render("./account/update", {
+    title: "Update Account",
+    statusHeader,
+    nav,
+    greeting,
+    grid,
     errors: null,
   })
 }
@@ -168,4 +204,4 @@ async function accountLogin(req, res) {
  }
 
 
-module.exports = { buildLogin, buildRegister, registerAccount, accountLogin, buildAccountManagement }
+module.exports = { buildLogin, buildRegister, registerAccount, accountLogin, buildAccountManagement, buildAccountUpdateView, buildLogout }
