@@ -26,8 +26,6 @@ async function buildLogout(req, res, next) {
 
   res.clearCookie('jwt');
   res.locals.loggedin = 0
-  let nav = await utilities.getNav()
-  const statusHeader = await utilities.buildStatusHeader(req, res)
   res.redirect('/')
 }
 
@@ -230,7 +228,7 @@ async function accountUpdate(req, res) {
   return
  }
 
- /* ****************************************
+/* ****************************************
 *  Change password
 * *************************************** */
 async function changePassword(req, res) {
