@@ -65,26 +65,26 @@ Util.buildClassificationGrid = async function (data) {
 Util.buildAccountUpdateGrid = async function (data) {
   let grid
   if (data) {
-    grid = '<form class="update-form" action="/account/register" method="post">'
+    grid = '<form class="update-form" action="/account/update/' + data.account_id + '" method="post">'
     grid += '<label for="firstname">First Name:</label>'
-    grid += '<input type="text" name="account_firstname" id="accountFirstname" required value="' + data.rows[0].account_firstname + '">'
+    grid += '<input type="text" name="account_firstname" id="accountFirstname" required value="' + data.account_firstname + '">'
     grid += '<label for="lastname">Last Name:</label>'
-    grid += '<input type="text" id="accountlastname" name="account_lastname" required value="' + data.rows[0].account_lastname + '">'
+    grid += '<input type="text" id="accountlastname" name="account_lastname" required value="' + data.account_lastname + '">'
     grid += '<label for="email">Email:</label>'
-    grid += '<input type="email" id="accountemail" name="account_email" required value="' + data.rows[0].account_email + '">'
-    grid += '<input type="hidden" name="account_id" value="' + data.rows[0].account_id + '">'
-    grid += '<button type="submit">Update Now</button>'
+    grid += '<input type="email" id="accountemail" name="account_email" required value="' + data.account_email + '">'
+    grid += '<input type="hidden" name="account_id" value="' + data.account_id + '">'
+    grid += '<button type="submit" for="update-form" name="accountUpdate">Update Now</button>'
     grid += '</form>'
 
 
-
-    grid += '<form class="password-form" action="/account/register" method="post"></form>'
-    grid += '<h2>Change Password</h2>'
+    grid += '<h2 class="passForm">Change Password</h2>'
+    grid += '<form class="password-form" action="/account/updates/' + data.account_id + '" method="post">'
     grid += '<label for="password">Password:</label>'
-    grid += '<input type="password" id="accountpassword" name="account_password" required pattern="^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s).{12,}$">'
-    grid +=  '<input type="hidden" name="account_id" value="' + data.rows[0].account_id + '">'
+    grid += '<input type="password" id="accountpassword" name="account_password" required pattern="^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\\s).{12,}$">'
+    grid +=  '<input type="hidden" name="account_id" value="' + data.account_id + '">'
+    grid += '<button type="submit" for="password-form" name="passwordUpdate">Change Password</button>'
     grid += '<div>'
-    grid += '<p>Passwords must have at least:</p>'
+    grid += '<p class="info">Passwords must have at least:</p>'
     grid += '<ol>'
     grid += '<li>a minimum of 12 characters</li>'
     grid += '<li>one capital letter</li>'
@@ -93,7 +93,6 @@ Util.buildAccountUpdateGrid = async function (data) {
     grid += '<li>one non-alphanumeric character</li>'
     grid += '</ol>'
     grid += '</div>'
-    grid += '<button type="submit">Change Password</button>'
     grid += '</form>'
   } else {
     grid += '<p class="notice">Sorry, no matching accounts could be found.</p>'
@@ -211,10 +210,10 @@ Util.buildStatusHeader = async function (req, res) {
   let header;
   if (res.locals.loggedin) {
     let accountData = res.locals.accountData
-  header = `<a title="Go to account" href="/account/">Welcome ${accountData.account_firstname} </a>`
-      header +=  '<a title="Click to log out" href="/account/logout">Logout</a>'
+  header = `<a title="Go to account" class="headerLoggedin" href="/account/">Welcome ${accountData.account_firstname} </a>`
+      header +=  '<a class="headerLoggedin" title="Click to log out" href="/account/logout">Logout</a>'
   }else{
-  header = '<a title="Click to log in" href="/account/login">My Account</a>'
+  header = '<a class="headerLoggedout" title="Click to log in" href="/account/login">My Account</a>'
   }
   return header
 }
@@ -224,12 +223,12 @@ Util.buildGreeting = async function (req, res) {
   let accountData = res.locals.accountData
   if (accountData.account_type === "Employee" || accountData.account_type === "Admin") {
     greeting = `<h2 class="greeting">Welcome ${accountData.account_firstname} </h2>`
-      greeting += '<a title="Click to update accounts" href="/account/update">Edit Account Information</a>' 
+      greeting += `<a class="modify" title="Click to update accounts" href="/account/update/${accountData.account_id}">Edit Account Information</a>` 
       greeting += '<h3>Inventory Manage</h3>'
-      greeting += '<a title="Click to edit inventory" href="/inv">Manage Inventory</a>' 
+      greeting += '<a class="modify" title="Click to edit inventory" href="/inv">Manage Inventory</a>' 
   }else if (accountData.account_type === "Client") {
   greeting = `<h2 class="greeting">Welcome ${accountData.account_firstname} </h2>`
-    greeting += '<a title="Click to update accounts" href="/account/update/'
+    greeting += '<a class="modify" title="Click to update accounts" href="/account/update/'
                  + accountData.account_id + '">Edit Account Information</a>' 
   }
   return greeting

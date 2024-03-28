@@ -23,6 +23,12 @@ router.get('/', utilities.checkLogin, utilities.handleErrors(accountController.b
 //Process to update user account
 router.get('/update/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildAccountUpdateView))
 
+//Process to update user account
+router.post('/update/:id', utilities.checkLogin, utilities.handleErrors(accountController.accountUpdate))
+
+//Process to update user account
+router.post('/updates/:id', utilities.checkLogin, utilities.handleErrors(accountController.changePassword))
+
 //Process to logout
 router.get('/logout', utilities.handleErrors(accountController.buildLogout))
 

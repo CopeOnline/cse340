@@ -307,6 +307,53 @@ footer {
   font-style: italic;
   font-weight: 500;
 }
+.headerLoggedin, .headerLoggedout {
+  padding-right: 10px;
+}
+.greeting {
+  padding-left: 15px;
+}
+.modify {
+  padding: 20px 0 20px 10px;
+  text-decoration: underline;
+  font-size: 24px;
+}
+form.update-form, form.password-form {
+  display: inline-flex;
+  flex-direction: column;
+  padding-left: 25px;
+  font-size: 20px;
+}
+.passForm {
+  padding-left: 10px;
+}
+form.update-form label, form.password-form label {
+  padding: 5px 0 3px 0;
+}
+form.update-form input, form.password-form input {
+  height: 20px;
+  font-size: 18px;
+  margin-bottom: 5px;
+  border-radius: 5px;
+  padding: 5px;
+}
+form.update-form button, form.password-form button {
+  width: fit-content;
+  font-size: 25px;
+  align-self: center;
+  border-radius: 10px;
+  background-color: #1f3c61;
+  color: #ffffff;
+}
+.info {
+  margin-bottom: 0;
+}
+ol {
+  margin-top: 0;
+}
+li {
+  list-style: square;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
