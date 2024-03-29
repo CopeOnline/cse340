@@ -24,9 +24,11 @@ async function buildLogin(req, res, next) {
 * *************************************** */
 async function buildLogout(req, res, next) {
 
-  res.clearCookie('jwt');
+  res.clearCookie('jwt')
   res.locals.loggedin = 0
-  res.redirect('/')
+  req.session.destroy((err) => {
+  res.redirect('/') // will always fire after session is destroyed
+  })
 }
 
 /* ****************************************

@@ -15,8 +15,8 @@
 <% } %>
   
   
-  <form class='inventory-form' action="/inv/delete" method="post"  >
-    <p class="delete">Confirm Deletion - The delete is permanent.</p>
+  <form class='delete-form' action="/inv/delete" method="post"  >
+    <p class="delete">Confirm Deletion - Inventory CANNOT be restored after delete .</p>
 
     <label for="invmake">Make:</label>
     <input type="text" name="inv_make" id="invmake" readonly value="<%= locals.inv_make %>">

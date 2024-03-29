@@ -40,6 +40,6 @@ router.post("/update/", utilities.checkLogin, accntValidate.checkAccountType, re
 router.get("/delete/:inv_id", utilities.checkLogin, accntValidate.checkAccountType, utilities.handleErrors(invController.deleteInventoryView))
 
 // Route to submit inventory to delete
-router.post("/delete/", utilities.checkLogin, accntValidate.checkAccountType, utilities.handleErrors(invController.removeInventory))
+router.post("/delete/:inv_id", utilities.checkLogin, accntValidate.checkAccountType, utilities.handleErrors(invController.removeInventory))
 
 module.exports = router
