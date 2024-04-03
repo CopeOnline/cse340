@@ -49,15 +49,77 @@ async function buildRegister(req, res, next) {
 *  Deliver account management view
 * *************************************** */
 async function buildAccountManagement(req, res, next) {
+  const account_id  = res.locals.accountData.account_id
   let nav = await utilities.getNav()
   const statusHeader = await utilities.buildStatusHeader(req, res)
-  const greeting = await utilities.buildGreeting(req, res)
+  const internalMessages = await utilities.buildMessageNotifications(account_id)
+  const greeting = await utilities.buildGreetingView(req, res, internalMessages)
   res.render("./account/account-management", {
     errors: null,
     title: "Account",
     statusHeader,
     nav,
     greeting,
+  })
+}
+
+/* ****************************************
+*  Deliver account inbox view
+* *************************************** */
+async function buildInboxView(req, res, next) {
+  const { account_id, account_firstname, account_lastname } = res.locals.accountData
+  let titleDef = `${account_firstname}` + ' ' + `${account_lastname}` + ' Inbox'
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const grid = await utilities.buildMessageList(req, res)
+  res.render("./account/inbox", {
+    errors: null,
+    title: titleDef,
+    statusHeader,
+    nav,
+    greeting,
+    grid,
+  })
+}
+
+/* ****************************************
+*  Deliver new message view
+* *************************************** */
+async function buildNewMessageView(req, res, next) {
+  let nav = await utilities.getNav()
+  let data = res.locals.accountData
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const form = await utilities.buildNewMessage(data)
+  res.render("./account/new_message", {
+    errors: null,
+    title: "New Message",
+    statusHeader,
+    nav,
+    greeting,
+    form,
+  })
+}
+
+/* ****************************************
+*  Deliver message view
+* *************************************** */
+async function buildMessageView(req, res, next) {
+  const Id = parseInt(req.params.id)
+  let data = await accountModel.getMessageById(Id)
+  let subject = data.message_subject
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const grid = await utilities.buildMessageView(data)
+  res.render("./account/view_message", {
+    errors: null,
+    title: subject,
+    statusHeader,
+    nav,
+    greeting,
+    grid,
   })
 }
 
@@ -70,7 +132,7 @@ async function buildAccountUpdateView(req, res, next) {
   const grid = await utilities.buildAccountUpdateGrid(data)
   let nav = await utilities.getNav()
   const statusHeader = await utilities.buildStatusHeader(req, res)
-  const greeting = await utilities.buildGreeting(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
   res.render("./account/update", {
     title: "Update Account",
     statusHeader,
@@ -172,7 +234,7 @@ async function accountLogin(req, res) {
 async function accountUpdate(req, res) {
   let nav = await utilities.getNav()
   const statusHeader = await utilities.buildStatusHeader(req, res)
-  const greeting = await utilities.buildGreeting(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
   const { account_id, account_firstname, account_lastname, account_email } = req.body
   let data = await accountModel.getAccountById(account_id)
   let grid = await utilities.buildAccountUpdateGrid(data)
@@ -285,6 +347,51 @@ async function changePassword(req, res) {
   }
 }
 
+ /* ****************************************
+ *  Process new message
+ * ************************************ */
+ async function processNewMessage(req, res) {
+  const { message_subject, message_body, message_created, message_to, message_from, message_read, message_archived } = req.body
+  console.log({ message_subject, message_body, message_created, message_to, message_from, message_read, message_archived}, "runner")
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  
+  const regResult = await accountModel.createNewMessage(message_subject, message_body, message_created, message_to, message_from, message_read, message_archived)
+  grid = await utilities.buildAccountUpdateGrid(data)
+    if (regResult) {
+      req.flash(
+        "notice",
+        `Success, message sent.`
+      )
+      res.render("./account/send", {
+        title: "New Message",
+        statusHeader,
+        nav,
+        greeting,
+        grid,
+        errors: null,
+        account_firstname,
+        account_lastname,
+        account_email,
+      })
+    } else {
+      req.flash("notice", `Failed, to send message .`)
+      res.status(501).render("./account/send", {
+        title: "New Message",
+        statusHeader,
+        nav,
+        greeting,
+        grid,
+        errors,
+        account_firstname,
+        account_lastname,
+        account_email,
+      })
+    }   
+  return
+ }
+
 
 module.exports = { 
   buildLogin, 
@@ -295,5 +402,9 @@ module.exports = {
   buildAccountUpdateView, 
   buildLogout, 
   accountUpdate, 
-  changePassword
+  changePassword,
+  buildInboxView,
+  buildNewMessageView,
+  buildMessageView,
+  processNewMessage
 }

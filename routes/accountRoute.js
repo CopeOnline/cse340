@@ -17,7 +17,7 @@ router.post('/register', regValidate.registationRules(), regValidate.checkRegDat
 // Process the login attempt 
 router.post("/login", regValidate.loginRules(), regValidate.checkLoginData, utilities.handleErrors(accountController.accountLogin))
 
-//Process updated inventory
+//Process account
 router.get('/', utilities.checkLogin, utilities.handleErrors(accountController.buildAccountManagement))
 
 //Process to update user account
@@ -26,10 +26,22 @@ router.get('/update/:id', utilities.checkLogin, utilities.handleErrors(accountCo
 //Process to update user account
 router.post('/update/:id', utilities.checkLogin, utilities.handleErrors(accountController.accountUpdate))
 
-//Process to update user account
+//Process to update user password
 router.post('/updates/:id', utilities.checkLogin, utilities.handleErrors(accountController.changePassword))
 
 //Process to logout
 router.get('/logout', utilities.handleErrors(accountController.buildLogout))
+
+//Route to account inbox
+router.get('/inbox/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildInboxView))
+
+//Route to new message view
+router.get('/inbox/message/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildMessageView))
+
+//Route to new message view
+router.get('/inbox/new/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildNewMessageView))
+
+//Process to send message
+router.post('/inbox/send/:id', utilities.checkLogin, utilities.handleErrors(accountController.processNewMessage))
 
 module.exports = router

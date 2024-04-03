@@ -25,6 +25,19 @@ async function checkExistingEmail(account_email){
   }
 }
 
+/* **********************
+ *   Get existing accounts
+ * ********************* */
+async function getAllAccounts(){
+  try {
+    const sql = "SELECT * FROM account"
+    const accounts = await pool.query(sql, [])
+    return accounts
+  } catch (error) {
+    return error.message
+  }
+}
+
 /* *****************************
 * Return account data using email address
 * ***************************** */
@@ -80,4 +93,55 @@ async function updatePassword(account_id, account_password) {
   }
 }
 
-  module.exports = { registerAccount, checkExistingEmail, getAccountByEmail, getAccountById, updateAccount, updatePassword }
+/* *****************************
+* Return account data using  id
+* ***************************** */
+async function getMessageById(message_id) {
+  try {
+    const result = await pool.query(
+      'SELECT message_id, message_subject, message_body, message_created, message_to, message_from, message_read, message_archived FROM message WHERE message_id = $1',
+      [message_id])
+    return result.rows[0]
+  } catch (error) {
+    return new Error("No message found")
+  }
+}
+
+/* *****************************
+* Return messages by recipient
+* ***************************** */
+async function getMessageByRecipient(message_to) {
+  try {
+    const result = await pool.query(
+      'SELECT message_id, message_subject, message_body, message_created, message_from, message_read, message_archived FROM message WHERE message_to = $1',
+      [message_to])
+    return result
+  } catch (error) {
+    return new Error("No message found")
+  }
+}
+
+/* *****************************
+* Create new message using id
+* ***************************** */
+async function createNewMessage(message_subject, message_body, message_created, message_to, message_from){
+  try {
+    const sql = "INSERT INTO message (message_subject, message_body, message_created, message_to, message_from, message_read, message_archived) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"
+    return await pool.query(sql, [message_subject, message_body, message_created, message_to, message_from])
+  } catch (error) {
+    return error.message
+  }
+}
+
+  module.exports = { 
+    registerAccount, 
+    checkExistingEmail, 
+    getAccountByEmail, 
+    getAccountById, 
+    updateAccount, 
+    updatePassword, 
+    getMessageById,
+    getAllAccounts, 
+    createNewMessage,
+    getMessageByRecipient
+   }

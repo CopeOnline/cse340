@@ -1,4 +1,5 @@
 const invModel = require('../models/inventory-model')
+const accntModel = require('../models/account-model')
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 const Util = {}
@@ -138,6 +139,44 @@ Util.buildDetailsView = async function (data) {
   return grid
 }
 
+/* **************************************
+* Build the new message form
+* ************************************ */
+Util.buildNewMessage = async function (data, account_id = null) {
+  let group = await accntModel.getAllAccounts()
+  console.log(group)
+  let list = '<select name="message_to" id="accountList" required>'  
+  list += "<option value=''>Choose a Recipient</option>"
+  group.rows.forEach((row) => {
+    list += '<option value="' + row.account_id + '"'
+    if ( account_id != null && 
+      row.account_id == account_id ) {
+    list += " selected "}
+    list += ">" + row.account_firstname + ' ' + row.account_lastname + "</option>"})
+    list += "</select>"
+
+  let to 
+  let form
+  if (data) {
+    form =  '<form class="newMessage-form" action="/account/inbox/send/' + data.account_id + '" method="post">'
+    form +=  list
+    form += '<label for="messageSubject">Subject:</label>'
+    form += '<input type="text" name="message_subject" id="messageSubject" required >'
+    form += '<label for="messageBody">Message:</label>'
+    form += '<input type="textbox" name="message_body" id="messageBody" required >'
+    form += '<input type="hidden" name="message_from" id="messageFrom" required value="' + data.account_id + '">'
+    form += '<input type="hidden" name="message_read" value="false">'
+    form += '<input type="hidden" name="message_archived" value="false">'
+    form += '<input type="hidden" name="account_id" value="' + to + '">'
+    form += '<button type="submit" for="newMessage-form" name="newMessage">Send</button>'
+    form += '</form>'
+
+  } else {
+    form += '<p class="notice">Sorry, new message could not be created.</p>'
+  }
+  return form
+}
+
 /* ****************************************
  * Middleware For Handling Errors
  * Wrap other function in this for
@@ -218,21 +257,136 @@ Util.buildStatusHeader = async function (req, res) {
   return header
 }
 
-Util.buildGreeting = async function (req, res) {
+/* ****************************************
+ *  Build Greeting by account login 
+ * ************************************ */ 
+Util.buildGreetingView = async function (req, res, internalMessages) {
   let greeting;
   let accountData = res.locals.accountData
   if (accountData.account_type === "Employee" || accountData.account_type === "Admin") {
     greeting = `<h2 class="greeting">Welcome ${accountData.account_firstname} </h2>`
       greeting += `<a class="modify" title="Click to update accounts" href="/account/update/${accountData.account_id}">Edit Account Information</a>` 
+      greeting += `${internalMessages}`
       greeting += '<h3>Inventory Manage</h3>'
       greeting += '<a class="modify" title="Click to edit inventory" href="/inv">Manage Inventory</a>' 
   }else if (accountData.account_type === "Client") {
   greeting = `<h2 class="greeting">Welcome ${accountData.account_firstname} </h2>`
-    greeting += '<a class="modify" title="Click to update accounts" href="/account/update/'
-                 + accountData.account_id + '">Edit Account Information</a>' 
+    greeting += '<a class="modify" title="Click to update accounts" href="/account/update/'+ accountData.account_id + '">Edit Account Information</a>'
+    greeting +=  `${internalMessages}`
   }
   return greeting
 }
+
+/* ****************************************
+ *  Build Notifications for account management view
+ * ************************************ */ 
+Util.buildMessageNotifications = async function (account_id) {
+  const messages = await accntModel.getMessageByRecipient(account_id)
+  let data = await accntModel.getAllAccounts()
+  let count = messages.rowCount
+  let notification = '<h2 class="messageCenter" >Message Center</h2>'
+    notification += "<ol>"
+    notification += '<li>'
+    notification += `<p class="messageCount">You have ${count} unread message(s).</p>`
+    notification += '</li>' + '<li>'
+    notification += '<p class="inbox">Go to</p>'
+    notification += `<a class="inboxLink" title="Got to inbox" href="/account/inbox/${account_id}">inbox</a>` + '</li>'
+  return notification
+}
+
+/* ****************************************
+ *  Build list for internal messages
+ * ************************************ */ 
+Util.buildMessageList = async function (req, res) {
+    const { account_id } = res.locals.accountData
+    const results = await accntModel.getMessageByRecipient(account_id)
+    let data = await accntModel.getAllAccounts()
+    let count = 0;
+
+    await results.rows.forEach((row) => {
+      if (row.message_archived == true) {
+        count += 1
+      }
+    }) 
+
+    let messageList = `<a class="newMessage" title="Create new message" href="/account/inbox/new/${account_id}">Create New Message</a>`
+    messageList += `<a class="archivedMessage" title="View archived messages" href="/account/inbox/archived/${account_id}">View `
+    messageList += `${count}` +  ' Archived Messages </a>'
+    results.rows.forEach((row) => {
+      messageList += '<table class="inboxView">' + '<thead><tr><th scope="col">Recieved</th>' + '<th scope="col">Subject</th>' + '<th scope="col">From</th>'
+      messageList += '<th scope="col">Read</th></tr></thead>' 
+      messageList += '<tbody><tr><th scope="row">' + `${row.message_created.toLocaleDateString('en-US')}` + ' '    
+      messageList += `${row.message_created.toLocaleTimeString('en-US')}` + '</th>' + '<td>' + `<a href="/account/inbox/message/${row.message_id}"> ${row.message_subject}</a>` + '</td>' + '<td>' 
+      data.rows.forEach((account) => {
+        if (account.account_id === row.message_from) {
+          messageList += `${account.account_firstname}` + ' ' + `${account.account_lastname}` + '</td>'
+        }})
+      messageList +=   '<td>' + `${row.message_read}` + '</td>' + '</tr>' 
+      
+    })
+    messageList += '</table>'
+    
+    return messageList
+  }
+
+  /* ****************************************
+ * Middleware building dropdown for message recipient
+ **************************************** */ 
+Util.buildAccountList = async function (account_id = null) {
+  let data = await accntModel.getAllAccounts()
+  let accountList =
+    '<select name="account_id" id="accountList" required>'
+  accountList += "<option value=''>Choose a Recipient</option>"
+  data.rows.forEach((row) => {
+    accountList += '<option value="' + row.account_id + '"'
+    if (
+      account_id != null &&
+      row.account_id == account_id
+    ) {
+      accountList += " selected "
+    }
+    accountList += ">" + row.account_firstname + ' ' + row.account_lastname + "</option>"
+  })
+  accountList += "</select>"
+  return accountList
+}
+
+/* ****************************************
+ * Middleware building message viewer
+ **************************************** */ 
+Util.buildMessageView = async function (data) {
+  console.log(data)
+  let sender = await accntModel.getAllAccounts()
+  let fromFirstName
+  let fromLastName
+  sender.rows.forEach((account) => {
+    if (account.account_id === data.message_from) {
+      fromFirstName = account.account_firstname
+      fromLastName = account.account_lastname 
+    }})
+  let message = '<h2 class="messageView" >Subject:</h2>'
+  message += '<p class="message">' + data.message_subject + '</p>'
+  message += '<h2 class="messageView" >From:</h2>' + '<p class="message">' 
+  message +=  fromFirstName + ' ' + fromLastName + '</p>'
+  message += '<h2 class="messageView" >Message:</h2>'
+  message += '<p class="message">' + data.message_body + '</p>'
+  message +=  '<hr>'
+  message +=  `<a class="returnInbox" title="Return to Inbox" href="/account/inbox/${data.message_to}">Return to Inbox</a>`
+  message +=  `<a class="reply" name="reply" Title="Reply" href="/account/inbox/new/${data.message_to}">`
+  message +=  `<button type="submit" value="${data.message_from}">Reply</button></a>`
+  message +=  `<a class="reply" name="read" Title="Mark as Read" href="/account/inbox/read/${data.message_to}">`
+  message +=  `<button type="submit" value="${data.message_id}">Mark as Read</button></a>`
+  message +=  `<a class="reply" name="archive" Title="Archive Message" href="/account/inbox/archive/${data.message_to}">`
+  message +=  `<button type="submit" value="${data.message_id}">Archive Message</button></a>`
+  message +=  `<a class="reply" name="delete" Title="Delete Message" href="/account/inbox/delete/${data.message_to}">`
+  message +=  `<button type="submit" value="${data.message_id}">Delete Message</button></a>`
+
+return message
+
+}
+
+
+
 
 
 module.exports = Util
