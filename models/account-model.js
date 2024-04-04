@@ -124,12 +124,51 @@ async function getMessageByRecipient(message_to) {
 /* *****************************
 * Create new message using id
 * ***************************** */
-async function createNewMessage(message_subject, message_body, message_created, message_to, message_from){
+async function createNewMessage(message_subject, message_body, message_to, message_from){
   try {
-    const sql = "INSERT INTO message (message_subject, message_body, message_created, message_to, message_from, message_read, message_archived) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *"
-    return await pool.query(sql, [message_subject, message_body, message_created, message_to, message_from])
+    const sql = "INSERT INTO message (message_subject, message_body, message_to, message_from) VALUES ($1, $2, $3, $4 ) RETURNING *"
+    return await pool.query(sql, [message_subject, message_body, message_to, message_from])
   } catch (error) {
     return error.message
+  }
+}
+
+/* *****************************
+* Update message status
+* ***************************** */
+async function updateMessageReadStatus(message_id, message_read) {
+  try {
+    const sql =
+      "UPDATE public.message SET  message_read = $2 WHERE message_id = $1 RETURNING *"
+    return await pool.query(sql, [message_id, message_read])
+  } catch (error) {
+    console.error("read error: " + error)
+  }
+}
+
+/* *****************************
+* Set message archived status
+* ***************************** */
+async function updateMessageArchivedStatus(message_id, message_archived) {
+  try {
+    const sql =
+      "UPDATE public.message SET  message_archived = $2 WHERE message_id = $1 RETURNING *"
+    return await pool.query(sql, [message_id, message_archived])
+  } catch (error) {
+    console.error("Archive error: " + error)
+  }
+}
+
+/* *****************************
+* Delete message
+* ***************************** */
+async function deleteMessage(message_id) {
+  try {
+    const sql =
+      "DELETE FROM public.message WHERE message_id = $1 RETURNING *"
+    return await pool.query(sql, [message_id])
+  } catch (error) {
+    console.error("password error: " + error)
   }
 }
 
@@ -143,5 +182,8 @@ async function createNewMessage(message_subject, message_body, message_created, 
     getMessageById,
     getAllAccounts, 
     createNewMessage,
-    getMessageByRecipient
+    getMessageByRecipient,
+    updateMessageReadStatus,
+    updateMessageArchivedStatus,
+    deleteMessage,
    }

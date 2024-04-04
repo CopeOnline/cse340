@@ -92,7 +92,7 @@ async function buildNewMessageView(req, res, next) {
   const statusHeader = await utilities.buildStatusHeader(req, res)
   const greeting = await utilities.buildGreetingView(req, res)
   const form = await utilities.buildNewMessage(data)
-  res.render("./account/new_message", {
+  res.render("./account/message/new_message", {
     errors: null,
     title: "New Message",
     statusHeader,
@@ -113,7 +113,7 @@ async function buildMessageView(req, res, next) {
   const statusHeader = await utilities.buildStatusHeader(req, res)
   const greeting = await utilities.buildGreetingView(req, res)
   const grid = await utilities.buildMessageView(data)
-  res.render("./account/view_message", {
+  res.render("./account/message/view_message", {
     errors: null,
     title: subject,
     statusHeader,
@@ -302,7 +302,6 @@ async function changePassword(req, res) {
   const greeting = await utilities.buildGreeting(req, res)
   let data = await accountModel.getAccountById(account_id)
   let grid = await utilities.buildAccountUpdateGrid(data)
-
   // Hash the password before storing
   let hashedPassword
   try {
@@ -318,9 +317,7 @@ async function changePassword(req, res) {
       errors: null,
     })
   }
-
   const regResult = await accountModel.updatePassword(account_id, hashedPassword)
-
   if (regResult) {
     req.flash(
       "notice",
@@ -351,46 +348,217 @@ async function changePassword(req, res) {
  *  Process new message
  * ************************************ */
  async function processNewMessage(req, res) {
-  const { message_subject, message_body, message_created, message_to, message_from, message_read, message_archived } = req.body
-  console.log({ message_subject, message_body, message_created, message_to, message_from, message_read, message_archived}, "runner")
+  const { message_subject, message_body, message_to, message_from} = req.body
   let nav = await utilities.getNav()
   const statusHeader = await utilities.buildStatusHeader(req, res)
   const greeting = await utilities.buildGreetingView(req, res)
-  
-  const regResult = await accountModel.createNewMessage(message_subject, message_body, message_created, message_to, message_from, message_read, message_archived)
-  grid = await utilities.buildAccountUpdateGrid(data)
+  let data = res.locals.accountData
+  const regResult = await accountModel.createNewMessage(message_subject, message_body, message_to, message_from)
+  const form = await utilities.buildNewMessage(data)
     if (regResult) {
       req.flash(
         "notice",
         `Success, message sent.`
       )
-      res.render("./account/send", {
+      res.render("./account/message/new_message", {
         title: "New Message",
         statusHeader,
         nav,
         greeting,
-        grid,
+        form,
         errors: null,
-        account_firstname,
-        account_lastname,
-        account_email,
       })
     } else {
       req.flash("notice", `Failed, to send message .`)
-      res.status(501).render("./account/send", {
+      res.status(501).render("./account/message/new_message", {
         title: "New Message",
         statusHeader,
         nav,
         greeting,
-        grid,
+        form,
         errors,
-        account_firstname,
-        account_lastname,
-        account_email,
       })
     }   
   return
  }
+
+/* ****************************************
+*  Deliver archived message view
+* *************************************** */
+async function buildArchivedMessageView(req, res, next) {
+  const { account_id, account_firstname, account_lastname } = res.locals.accountData
+  let titleDef = `${account_firstname}` + ' ' + `${account_lastname}` + ' Archived Messages'
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const grid = await utilities.buildArchivedMessageList(req, res)
+  res.render("./account/message/archived_message", {
+    errors: null,
+    title: titleDef,
+    statusHeader,
+    nav,
+    greeting,
+    grid,
+  })
+}
+
+ /* ****************************************
+ *  Process delete message view
+ * ************************************ */
+ async function buildDeleteMessageView(req, res) {
+  const { message_id } = req.body
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const form = await utilities.buildMessageDeleteList(res, message_id)
+      res.render("./account/message/delete_message", {
+        title: "Delete Message",
+        statusHeader,
+        nav,
+        greeting,
+        form,
+        errors: null,
+      })
+  return
+ }
+
+ /* ****************************************
+*  Update message status view
+* *************************************** */
+async function updateMessageToReadView(req, res, next) {
+  const { message_id, message_read } = req.body
+  let data = await accountModel.getMessageById(message_id)
+  let subject = data.message_subject
+  const regResult = await accountModel.updateMessageReadStatus(message_id, message_read)
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const grid = await utilities.buildMessageView(data)
+  if (regResult) {
+    req.flash(
+      "notice",
+      `Success, message status set to read.`
+    )
+    res.render("./account/message/view_message", {
+      title: subject,
+      statusHeader,
+      nav,
+      greeting,
+      grid,
+      errors: null,
+    })
+  } else {
+    req.flash("notice", `Failed, to update message .`)
+    res.status(501).redirect("./account/message/view_message", {
+      title: subject,
+      statusHeader,
+      nav,
+      greeting,
+      grid,
+      errors,
+    })
+  }   
+return
+}
+
+ /* ****************************************
+*  Update message archived view
+* *************************************** */
+async function updateMessageToArchivedView(req, res, next) {
+  const { message_id, message_archived } = req.body
+  console.log(message_id, message_archived)
+  let data = await accountModel.getMessageById(message_id)
+  let subject = data.message_subject
+  const regResult = await accountModel.updateMessageArchivedStatus(message_id, message_archived)
+  let nav = await utilities.getNav()
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const grid = await utilities.buildMessageView(data)
+  if (regResult) {
+    req.flash(
+      "notice",
+      `Success, message archived.`
+    )
+    res.render("./account/message/view_message", {
+      title: subject,
+      statusHeader,
+      nav,
+      greeting,
+      grid,
+      errors: null,
+    })
+  } else {
+    req.flash("notice", `Failed, to archive message .`)
+    res.status(501).redirect("./account/message/view_message", {
+      title: subject,
+      statusHeader,
+      nav,
+      greeting,
+      grid,
+      errors,
+    })
+  }   
+return
+}
+
+ /* ****************************************
+ *  Confirm delete message view
+ * ************************************ */
+ async function confirmDeleteMessageView(req, res) {
+  const { message_id } = req.body
+  let nav = await utilities.getNav()
+  const regResult = await accountModel.deleteMessage(message_id)
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const form = await utilities.buildMessageDeleteList(res, message_id)
+  if (regResult) {
+    const grid = await utilities.buildMessageList(req, res)
+    req.flash(
+      "notice",
+      `Success, message deleted.`
+    )
+    res.render("./account/inbox", {
+      title: "Inbox",
+      statusHeader,
+      nav,
+      greeting,
+      grid,
+      errors: null,
+    })
+  } else {
+    req.flash("notice", `Failed, to delete message .`)
+    res.status(501).redirect("./account/message/delete_message", {
+      title: subject,
+      statusHeader,
+      nav,
+      greeting,
+      form,
+      errors,
+    })
+  }   
+return
+}
+
+/* ****************************************
+*  Deliver reply message view
+* *************************************** */
+async function buildReplyMessageView(req, res, next) {
+  const { message_from } = req.body
+  let account_id = null
+  let nav = await utilities.getNav()
+  let data = res.locals.accountData
+  const statusHeader = await utilities.buildStatusHeader(req, res)
+  const greeting = await utilities.buildGreetingView(req, res)
+  const form = await utilities.buildNewMessage(data, message_from, account_id)
+  res.render("./account/message/new_message", {
+    errors: null,
+    title: "New Message",
+    statusHeader,
+    nav,
+    greeting,
+    form,
+  })
+}
 
 
 module.exports = { 
@@ -406,5 +574,11 @@ module.exports = {
   buildInboxView,
   buildNewMessageView,
   buildMessageView,
-  processNewMessage
+  processNewMessage, 
+  buildArchivedMessageView,
+  buildDeleteMessageView,
+  updateMessageToReadView,
+  updateMessageToArchivedView,
+  confirmDeleteMessageView,
+  buildReplyMessageView,
 }

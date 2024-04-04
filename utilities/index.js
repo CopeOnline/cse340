@@ -142,20 +142,29 @@ Util.buildDetailsView = async function (data) {
 /* **************************************
 * Build the new message form
 * ************************************ */
-Util.buildNewMessage = async function (data, account_id = null) {
+Util.buildNewMessage = async function (data, message_from, account_id = null) {
   let group = await accntModel.getAllAccounts()
-  console.log(group)
-  let list = '<select name="message_to" id="accountList" required>'  
-  list += "<option value=''>Choose a Recipient</option>"
-  group.rows.forEach((row) => {
-    list += '<option value="' + row.account_id + '"'
-    if ( account_id != null && 
-      row.account_id == account_id ) {
-    list += " selected "}
-    list += ">" + row.account_firstname + ' ' + row.account_lastname + "</option>"})
-    list += "</select>"
+  let list 
 
-  let to 
+  if (message_from) {
+    group.rows.forEach((row) => {
+      if (row.account_id == message_from ) {
+      list = '<h2 name="' + row.account_id + '"'
+      list += ">" + row.account_firstname + ' ' + row.account_lastname + "</h2>"}
+      console.log(row.account_id, list)
+  })
+  } else {
+    list = '<select name="message_to" id="accountList" required>'  
+    list += "<option value=''>Choose a Recipient</option>"
+    group.rows.forEach((row) => {
+      list += '<option value="' + row.account_id + '"'
+      if ( account_id != null && 
+        row.account_id == account_id ) {
+      list += " selected "}
+      list += ">" + row.account_firstname + ' ' + row.account_lastname + "</option>"})
+      list += "</select>"
+    }
+
   let form
   if (data) {
     form =  '<form class="newMessage-form" action="/account/inbox/send/' + data.account_id + '" method="post">'
@@ -167,7 +176,6 @@ Util.buildNewMessage = async function (data, account_id = null) {
     form += '<input type="hidden" name="message_from" id="messageFrom" required value="' + data.account_id + '">'
     form += '<input type="hidden" name="message_read" value="false">'
     form += '<input type="hidden" name="message_archived" value="false">'
-    form += '<input type="hidden" name="account_id" value="' + to + '">'
     form += '<button type="submit" for="newMessage-form" name="newMessage">Send</button>'
     form += '</form>'
 
@@ -282,8 +290,15 @@ Util.buildGreetingView = async function (req, res, internalMessages) {
  * ************************************ */ 
 Util.buildMessageNotifications = async function (account_id) {
   const messages = await accntModel.getMessageByRecipient(account_id)
-  let data = await accntModel.getAllAccounts()
-  let count = messages.rowCount
+  let count = 0
+  messages.rows.forEach((row) => {
+    if (row.message_read == false) {
+      if (row.message_archived == false){
+        count += 1
+      }     
+    }
+  })
+  
   let notification = '<h2 class="messageCenter" >Message Center</h2>'
     notification += "<ol>"
     notification += '<li>'
@@ -295,7 +310,7 @@ Util.buildMessageNotifications = async function (account_id) {
 }
 
 /* ****************************************
- *  Build list for internal messages
+ *  Build inbox list for internal messages
  * ************************************ */ 
 Util.buildMessageList = async function (req, res) {
     const { account_id } = res.locals.accountData
@@ -312,9 +327,10 @@ Util.buildMessageList = async function (req, res) {
     let messageList = `<a class="newMessage" title="Create new message" href="/account/inbox/new/${account_id}">Create New Message</a>`
     messageList += `<a class="archivedMessage" title="View archived messages" href="/account/inbox/archived/${account_id}">View `
     messageList += `${count}` +  ' Archived Messages </a>'
+    messageList += '<table class="inboxView">' + '<thead><tr><th scope="col">Recieved</th>' + '<th scope="col">Subject</th>' + '<th scope="col">From</th>'
+    messageList += '<th scope="col">Read</th></tr></thead>' 
     results.rows.forEach((row) => {
-      messageList += '<table class="inboxView">' + '<thead><tr><th scope="col">Recieved</th>' + '<th scope="col">Subject</th>' + '<th scope="col">From</th>'
-      messageList += '<th scope="col">Read</th></tr></thead>' 
+      if (row.message_archived != true) {
       messageList += '<tbody><tr><th scope="row">' + `${row.message_created.toLocaleDateString('en-US')}` + ' '    
       messageList += `${row.message_created.toLocaleTimeString('en-US')}` + '</th>' + '<td>' + `<a href="/account/inbox/message/${row.message_id}"> ${row.message_subject}</a>` + '</td>' + '<td>' 
       data.rows.forEach((account) => {
@@ -322,7 +338,7 @@ Util.buildMessageList = async function (req, res) {
           messageList += `${account.account_firstname}` + ' ' + `${account.account_lastname}` + '</td>'
         }})
       messageList +=   '<td>' + `${row.message_read}` + '</td>' + '</tr>' 
-      
+      }
     })
     messageList += '</table>'
     
@@ -355,7 +371,6 @@ Util.buildAccountList = async function (account_id = null) {
  * Middleware building message viewer
  **************************************** */ 
 Util.buildMessageView = async function (data) {
-  console.log(data)
   let sender = await accntModel.getAllAccounts()
   let fromFirstName
   let fromLastName
@@ -372,19 +387,92 @@ Util.buildMessageView = async function (data) {
   message += '<p class="message">' + data.message_body + '</p>'
   message +=  '<hr>'
   message +=  `<a class="returnInbox" title="Return to Inbox" href="/account/inbox/${data.message_to}">Return to Inbox</a>`
-  message +=  `<a class="reply" name="reply" Title="Reply" href="/account/inbox/new/${data.message_to}">`
-  message +=  `<button type="submit" value="${data.message_from}">Reply</button></a>`
-  message +=  `<a class="reply" name="read" Title="Mark as Read" href="/account/inbox/read/${data.message_to}">`
-  message +=  `<button type="submit" value="${data.message_id}">Mark as Read</button></a>`
-  message +=  `<a class="reply" name="archive" Title="Archive Message" href="/account/inbox/archive/${data.message_to}">`
-  message +=  `<button type="submit" value="${data.message_id}">Archive Message</button></a>`
-  message +=  `<a class="reply" name="delete" Title="Delete Message" href="/account/inbox/delete/${data.message_to}">`
-  message +=  `<button type="submit" value="${data.message_id}">Delete Message</button></a>`
+  message +=  '<form class="reply-form" action="/account/inbox/new/' + data.message_id + '" method="post">'
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Reply</button></a>`
+  message +=  `<input type="hidden" name="message_from" value="${data.message_from}">`
+  message +=  '</form>'
+  message +=  '<form class="updateRead-form" action="/account/inbox/read/' + data.message_id + '" method="post">'
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Mark as Read</button></a>`
+  message +=  '<input type="hidden" name="message_read" value="true">'
+  message +=  '</form>'
+  message +=  '<form class="updateArchived-form" action="/account/inbox/archived/' + data.message_id + '" method="post">'
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Archive Message</button></a>`
+  message +=  '<input type="hidden" name="message_archived" value="true">'
+  message +=  '</form>'
+  message +=  '<form class="updateDelete-form" action="/account/inbox/delete/' + data.message_id + '" method="post">'
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Delete Message</button></a>`
+  message +=  '</form>'
 
 return message
 
 }
 
+/* ****************************************
+ *  Build archived list for internal messages
+ * ************************************ */ 
+Util.buildArchivedMessageList = async function (req, res) {
+  const { account_id } = res.locals.accountData
+  const results = await accntModel.getMessageByRecipient(account_id)
+  let data = await accntModel.getAllAccounts()
+  let count = 0;
+
+  await results.rows.forEach((row) => {
+    if (row.message_archived == true) {
+      count += 1
+    }
+  }) 
+
+  let messageList = `<a class="newMessage" title="Create new message" href="/account/inbox/new/${account_id}">Create New Message</a>`
+  messageList += `<a class="archivedMessage" title="Go to Inbox" href="/account/inbox/${account_id}">`
+  messageList += ' Got to Inbox</a>'
+  messageList += '<table class="inboxView">' + '<thead><tr><th scope="col">Recieved</th>' + '<th scope="col">Subject</th>' + '<th scope="col">From</th>'
+  messageList += '<th scope="col">Read</th></tr></thead>' 
+  results.rows.forEach((row) => {
+    if (row.message_archived != false) {
+    messageList += '<tbody><tr><th scope="row">' + `${row.message_created.toLocaleDateString('en-US')}` + ' '    
+    messageList += `${row.message_created.toLocaleTimeString('en-US')}` + '</th>' + '<td>' + `<a href="/account/inbox/message/${row.message_id}"> ${row.message_subject}</a>` + '</td>' + '<td>' 
+    data.rows.forEach((account) => {
+      if (account.account_id === row.message_from) {
+        messageList += `${account.account_firstname}` + ' ' + `${account.account_lastname}` + '</td>'
+      }})
+    messageList +=   '<td>' + `${row.message_read}` + '</td>' + '</tr>' 
+    }
+  })
+  messageList += '</table>'
+  
+  return messageList
+}
+
+/* ****************************************
+ *  Build full list for internal messages
+ * ************************************ */ 
+Util.buildMessageDeleteList = async function (res, message_id) {
+  const { account_id } = res.locals.accountData
+  const results = await accntModel.getMessageById(message_id)
+  let data = await accntModel.getAllAccounts()
+
+  let messageList = `<a class="archivedMessage" title="Go to Inbox" href="/account/inbox/${account_id}">`
+  messageList += ' Got to Inbox</a>'
+  if (results) {
+  messageList += '<h2 class="finalDelete">Deletion is permanent, messages cannot be recovered!</h2>'
+  messageList += '<table class="inboxView">' + '<thead><tr><th scope="col">Recieved</th>' + '<th scope="col">Subject</th>' + '<th scope="col">From</th>'
+  messageList += '<th scope="col">Read</th>' + '<th scope="col">Delete Confirmation</th>' + '</tr></thead>' 
+  messageList += '<tbody><tr><th scope="row">' + `${results.message_created.toLocaleDateString('en-US')}` + ' '    
+  messageList += `${results.message_created.toLocaleTimeString('en-US')}` + '</th>' + '<td>' + `<a href="/account/inbox/message/${results.message_id}">`
+  messageList += ` ${results.message_subject}</a>` + '</td>' + '<td>' 
+  data.rows.forEach((account) => {
+      if (account.account_id === results.message_from) {
+        messageList += `${account.account_firstname}` + ' ' + `${account.account_lastname}` + '</td>' 
+      }})
+  messageList +=   '<td>' + `${results.message_read}` + '</td>' + '<td>' + `<a class="reply" name="delete" Title="Delete Message"` 
+  messageList +=  '<td>' + '<form class="updateDelete-form" action="/account/inbox/confirm/' + results.message_id + '" method="post">'
+  messageList +=  `<button type="submit" name="message_id" value="${results.message_id}">Delete Message</button></a>`
+  messageList +=  '</form>'
+  messageList +=  '</td>' + '</tr>' 
+  messageList += '</table>'
+    }
+  return messageList
+}
 
 
 

@@ -41,7 +41,25 @@ router.get('/inbox/message/:id', utilities.checkLogin, utilities.handleErrors(ac
 //Route to new message view
 router.get('/inbox/new/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildNewMessageView))
 
+//Route to arechived message view
+router.get('/inbox/archived/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildArchivedMessageView))
+
 //Process to send message
 router.post('/inbox/send/:id', utilities.checkLogin, utilities.handleErrors(accountController.processNewMessage))
+
+//Process to mark message as read 
+router.post('/inbox/read/:id', utilities.checkLogin, utilities.handleErrors(accountController.updateMessageToReadView))
+
+//Process to mark message as read 
+router.post('/inbox/archived/:id', utilities.checkLogin, utilities.handleErrors(accountController.updateMessageToArchivedView))
+
+//Process to delete message
+router.post('/inbox/delete/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildDeleteMessageView))
+
+//Process to confirm delete message
+router.post('/inbox/confirm/:id', utilities.checkLogin, utilities.handleErrors(accountController.confirmDeleteMessageView))
+
+//Process to reply to message
+router.post('/inbox/new/:id', utilities.checkLogin, utilities.handleErrors(accountController.buildReplyMessageView))
 
 module.exports = router
