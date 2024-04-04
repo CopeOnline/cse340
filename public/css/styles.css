@@ -401,7 +401,7 @@ table {
 .messageView {
   margin: 0 1em 10px 1em;
 }
-.messageSubject, .messageFrom {
+.messageSubject, .messageFrom, .messageDate {
   margin: 0 1em 0 0;
   width: 80%;
 }

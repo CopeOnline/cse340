@@ -380,9 +380,11 @@ Util.buildMessageView = async function (data) {
       fromFirstName = account.account_firstname
       fromLastName = account.account_lastname 
     }})
-  let message = '<div class="messageLayout">'
+  let message = '<div class="messageLayout">' 
   message += '<h2 class="messageView" >Subject:</h2>'
   message += '<p class="messageSubject">' + data.message_subject + '</p>'
+  message += '<h2 class="messageView" >Date:</h2>'
+  message += '<p class="messageDate">' + data.message_created.toLocaleDateString('en-US') + ' ' + data.message_created.toLocaleTimeString('en-US') + '</p>'
   message += '<h2 class="messageView" >From:</h2>' + '<p class="messageFrom">' 
   message +=  fromFirstName + ' ' + fromLastName + '</p>'
   message += '<h2 class="messageView" >Message:</h2>'
