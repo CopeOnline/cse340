@@ -67,23 +67,23 @@ Util.buildAccountUpdateGrid = async function (data) {
   let grid
   if (data) {
     grid = '<form class="update-form" action="/account/update/' + data.account_id + '" method="post">'
-    grid += '<label for="firstname">First Name:</label>'
-    grid += '<input type="text" name="account_firstname" id="accountFirstname" required value="' + data.account_firstname + '">'
-    grid += '<label for="lastname">Last Name:</label>'
+    grid += '<label for="accountfirstname">First Name:</label>'
+    grid += '<input type="text" name="account_firstname" id="accountfirstname" required value="' + data.account_firstname + '">'
+    grid += '<label for="accountlastname">Last Name:</label>'
     grid += '<input type="text" id="accountlastname" name="account_lastname" required value="' + data.account_lastname + '">'
-    grid += '<label for="email">Email:</label>'
+    grid += '<label for="accountemail">Email:</label>'
     grid += '<input type="email" id="accountemail" name="account_email" required value="' + data.account_email + '">'
     grid += '<input type="hidden" name="account_id" value="' + data.account_id + '">'
-    grid += '<button type="submit" for="update-form" name="accountUpdate">Update Now</button>'
+    grid += '<button type="submit" name="accountUpdate">Update Now</button>'
     grid += '</form>'
 
 
     grid += '<h2 class="passForm">Change Password</h2>'
     grid += '<form class="password-form" action="/account/updates/' + data.account_id + '" method="post">'
-    grid += '<label for="password">Password:</label>'
+    grid += '<label for="accountpassword">Password:</label>'
     grid += '<input type="password" id="accountpassword" name="account_password" required pattern="^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\\s).{12,}$">'
     grid +=  '<input type="hidden" name="account_id" value="' + data.account_id + '">'
-    grid += '<button type="submit" for="password-form" name="passwordUpdate">Change Password</button>'
+    grid += '<button type="submit" name="passwordUpdate">Change Password</button>'
     grid += '<div>'
     grid += '<p class="info">Passwords must have at least:</p>'
     grid += '<ol>'
@@ -172,11 +172,11 @@ Util.buildNewMessage = async function (data, message_from, account_id = null) {
     form += '<label for="messageSubject">Subject:</label>'
     form += '<input type="text" name="message_subject" id="messageSubject" required >'
     form += '<label for="messageBody">Message:</label>'
-    form += '<input type="textbox" name="message_body" id="messageBody" required >'
-    form += '<input type="hidden" name="message_from" id="messageFrom" required value="' + data.account_id + '">'
+    form += '<textarea name="message_body" id="messageBody" required ></textarea>'
+    form += '<input type="hidden" name="message_from" id="messageFrom" value="' + data.account_id + '">'
     form += '<input type="hidden" name="message_read" value="false">'
     form += '<input type="hidden" name="message_archived" value="false">'
-    form += '<button type="submit" for="newMessage-form" name="newMessage">Send</button>'
+    form += '<button type="submit" name="newMessage">Send</button>'
     form += '</form>'
 
   } else {
@@ -300,12 +300,13 @@ Util.buildMessageNotifications = async function (account_id) {
   })
   
   let notification = '<h2 class="messageCenter" >Message Center</h2>'
-    notification += "<ol>"
+    notification += '<ol>'
     notification += '<li>'
     notification += `<p class="messageCount">You have ${count} unread message(s).</p>`
     notification += '</li>' + '<li>'
     notification += '<p class="inbox">Go to</p>'
-    notification += `<a class="inboxLink" title="Got to inbox" href="/account/inbox/${account_id}">inbox</a>` + '</li>'
+    notification += `<a class="modify" id="inboxLink" title="Got to inbox" href="/account/inbox/${account_id}">Inbox</a>` + '</li>'
+    notification += '</ol>'
   return notification
 }
 
@@ -326,7 +327,7 @@ Util.buildMessageList = async function (req, res) {
 
     let messageList = `<a class="newMessage" title="Create new message" href="/account/inbox/new/${account_id}">Create New Message</a>`
     messageList += `<a class="archivedMessage" title="View archived messages" href="/account/inbox/archived/${account_id}">View `
-    messageList += `${count}` +  ' Archived Messages </a>'
+    messageList += `${count}` +  ' Archived Message(s) </a>'
     messageList += '<table class="inboxView">' + '<thead><tr><th scope="col">Recieved</th>' + '<th scope="col">Subject</th>' + '<th scope="col">From</th>'
     messageList += '<th scope="col">Read</th></tr></thead>' 
     results.rows.forEach((row) => {
@@ -379,29 +380,30 @@ Util.buildMessageView = async function (data) {
       fromFirstName = account.account_firstname
       fromLastName = account.account_lastname 
     }})
-  let message = '<h2 class="messageView" >Subject:</h2>'
-  message += '<p class="message">' + data.message_subject + '</p>'
-  message += '<h2 class="messageView" >From:</h2>' + '<p class="message">' 
+  let message = '<div class="messageLayout">'
+  message += '<h2 class="messageView" >Subject:</h2>'
+  message += '<p class="messageSubject">' + data.message_subject + '</p>'
+  message += '<h2 class="messageView" >From:</h2>' + '<p class="messageFrom">' 
   message +=  fromFirstName + ' ' + fromLastName + '</p>'
   message += '<h2 class="messageView" >Message:</h2>'
-  message += '<p class="message">' + data.message_body + '</p>'
-  message +=  '<hr>'
+  message += '<p class="messageBody">' + data.message_body + '</p>'
+  message +=  '</div>' + '<hr>' 
   message +=  `<a class="returnInbox" title="Return to Inbox" href="/account/inbox/${data.message_to}">Return to Inbox</a>`
   message +=  '<form class="reply-form" action="/account/inbox/new/' + data.message_id + '" method="post">'
-  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Reply</button></a>`
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Reply</button>`
   message +=  `<input type="hidden" name="message_from" value="${data.message_from}">`
   message +=  '</form>'
   message +=  '<form class="updateRead-form" action="/account/inbox/read/' + data.message_id + '" method="post">'
-  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Mark as Read</button></a>`
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Mark as Read</button>`
   message +=  '<input type="hidden" name="message_read" value="true">'
   message +=  '</form>'
   message +=  '<form class="updateArchived-form" action="/account/inbox/archived/' + data.message_id + '" method="post">'
-  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Archive Message</button></a>`
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Archive Message</button>`
   message +=  '<input type="hidden" name="message_archived" value="true">'
   message +=  '</form>'
   message +=  '<form class="updateDelete-form" action="/account/inbox/delete/' + data.message_id + '" method="post">'
-  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Delete Message</button></a>`
-  message +=  '</form>'
+  message +=  `<button type="submit" name="message_id" value="${data.message_id}">Delete Message</button>`
+  message +=  '</form>' 
 
 return message
 

@@ -376,6 +376,82 @@ p.manage-inventory {
 #classificationList {
   margin-left: 20px;
 }
+p.inbox {
+  margin: 0;
+  display: inline;
+}
+#inboxLink {
+  margin: 5px 0 0 5px;
+  padding: 0;
+}
+.newMessage, .archivedMessage {
+  display: block;
+  margin: 0 10px 10px 10px;
+  text-decoration: underline;
+}
+table {
+  width: 80%;
+  text-align: center;
+}
+.messageLayout {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+.messageView {
+  margin: 0 1em 10px 1em;
+}
+.messageSubject, .messageFrom {
+  margin: 0 1em 0 0;
+  width: 80%;
+}
+.messageBody {
+  width: 90%;
+  margin: auto;
+  display: inline;
+}
+.returnInbox {
+  text-decoration: underline;
+  margin: 15px;
+}
+form.reply-form, form.updateRead-form, form.updateArchived-form, form.updateDelete-form{
+  margin: 10px;
+}
+.toMessage {
+  margin-bottom: 0;
+}
+select#accountList {
+  font-size: 24px;
+  margin: 10px;
+  width: 10em;
+}
+form.newMessage-form {
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+  margin-left: 1em;
+}
+form.newMessage-form input, form.newMessage-form textarea {
+  margin: 5px;
+  padding: 5px;
+  font-size: 20px;
+  border-radius: 5px;
+}
+form.newMessage-form textarea{
+  height: 6em;
+}
+form.newMessage-form button{
+  width: 10em;
+  height: 2em;
+  margin: auto;
+  font-size: 24px;
+  color: #ffffff;
+  background-color: #1f3c61;
+  border-radius: 10px;
+}
+.note {
+  margin-left: 10px;
+}
 @media screen and (min-width: 500px) {
   body {
     background-image: url("../images/site/small_check.jpg");
